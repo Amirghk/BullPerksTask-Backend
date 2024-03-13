@@ -1,0 +1,14 @@
+@BullPerksTask_HostAddress = http://localhost:5227
+
+GET {{BullPerksTask_HostAddress}}/weatherforecast/
+Accept: application/json
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbWlyIiwiZXhwIjoxNzEwMzUwMjkxLCJpc3MiOiJCdWxsUGVya3NUYXNrIiwiYXVkIjoiQnVsbFBlcmtzVGFzayJ9.OiDuGgXQhnAVrZs7kXHFr88KL90aODa6Mqo_H939DqQ
+
+POST {{BullPerksTask_HostAddress}}/api/authentication/Login
+Accept: application/json
+
+{
+    "userName": "amir",
+}
+
+###
