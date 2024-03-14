@@ -1,4 +1,4 @@
-﻿namespace BullPerksTask.Domain;
+﻿namespace BullPerksTask.Infrastructure.Authentication;
 
 public class JwtSettings
 {

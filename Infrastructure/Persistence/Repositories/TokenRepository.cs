@@ -3,7 +3,7 @@ using BullPerksTask.Domain.Entities;
 using BullPerksTask.Infrastructure.Persistence.Db;
 using Microsoft.EntityFrameworkCore;
 
-namespace BullPerksTask.Infrastructure.Persistence;
+namespace BullPerksTask.Infrastructure.Persistence.Repositories;
 
 public class TokenRepository : ITokenRepository
 {
@@ -21,14 +21,9 @@ public class TokenRepository : ITokenRepository
     }
 
 
-    public async Task<Token> GetLastTokenInfo(CancellationToken cancellationToken)
+    public async Task<Token?> GetLastTokenInfo(CancellationToken cancellationToken)
     {
         var token = await _appDbContext.Tokens.OrderByDescending(x => x.DataFetchedAt).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-
-        if (token is null)
-        {
-            throw new Exception("No Token Exists!");
-        }
 
         return token;
     }

@@ -1,4 +1,4 @@
-﻿namespace BullPerksTask.Domain;
+﻿namespace BullPerksTask.Application;
 
 public class BLPSettings
 {

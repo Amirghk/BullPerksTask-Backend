@@ -1,34 +1,39 @@
 using BullPerksTask.Application;
+using BullPerksTask.Domain;
 using BullPerksTask.Infrastructure;
+using BullPerksTask.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services
-    .AddInfrastructure()
-    .AddAuth(builder.Configuration)
-    .AddApplication(builder.Configuration);
+    .AddInfrastructure(builder.Configuration)
+    .AddApplication(builder.Configuration)
+    .AddDomainServices();
 
+builder.Services.AddAuth(builder.Configuration);
 
-
-
-builder.Services.AddControllers(); 
-// todo: add authentication to swagger
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerWithAuth();
+
+builder.Services.AddControllers();
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -8,5 +8,5 @@ public class Token
     public required string Name { get; set; }
     public required string TotalSupply { get; set; }
     public required string CirculatingSupply { get; set;}
-    public required DateTime DataFetchedAt { get; set; }
+    public required DateTimeOffset DataFetchedAt { get; set; }
 }

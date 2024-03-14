@@ -1,10 +1,7 @@
-﻿using BullPerksTask.Application.Interfaces.Persistance;
-using BullPerksTask.Domain;
-using BullPerksTask.Domain.Entities;
-using BullPerksTask.Infrastructure.Persistence;
+﻿using BullPerksTask.Application.Interfaces.Adapters;
+using BullPerksTask.Application.Interfaces.Persistance;
+using BullPerksTask.Domain.Services;
 using Microsoft.Extensions.Options;
-using Nethereum.Web3;
-using Newtonsoft.Json;
 using System.Numerics;
 
 namespace BullPerksTask.Application.Commands;
@@ -12,39 +9,33 @@ namespace BullPerksTask.Application.Commands;
 public class CalculateTokenSupplyAndPersistToDatabaseAppService
 {
     private readonly ITokenRepository _tokenRepository;
+    private readonly IWeb3RPCAdapter _web3RPCAdapter;
     private readonly BLPSettings _settings;
-    public CalculateTokenSupplyAndPersistToDatabaseAppService(ITokenRepository tokenRepository, IOptions<BLPSettings> blpSettings)
+    private readonly GetTokenEntityDomainService _getTokenEntityDomainService;  // injecting the domain service to have explicit dependencies (as opposed to having it as a static class)
+    public CalculateTokenSupplyAndPersistToDatabaseAppService(
+        ITokenRepository tokenRepository,
+        IOptions<BLPSettings> blpSettings,
+        GetTokenEntityDomainService getTokenEntityDomainService,
+        IWeb3RPCAdapter web3RPCAdapter)
     {
         _tokenRepository = tokenRepository;
         _settings = blpSettings.Value;
+        _getTokenEntityDomainService = getTokenEntityDomainService;
+        _web3RPCAdapter = web3RPCAdapter;
     }
 
     public async Task Execute()
     {
-        var web3 = new Web3("https://go.getblock.io/6c1580d12bff4b2c82347901c3847537");
+        var totalSupply = await _web3RPCAdapter.GetTotalSupplyOfToken(_settings.BLPContractABI, _settings.BLPAddress);
 
-        var contract = web3.Eth.GetContract(_settings.BLPContractABI, _settings.BLPAddress);
-        var totalSupply = await contract.GetFunction("totalSupply").CallAsync<BigInteger>();
-
-        // calculate circulating supply
-        BigInteger nonCirculatingTokens = 0;
+        List<BigInteger> listOfNonCirculatingTokenAmounts = new();
         foreach (var address in _settings.EscrowAddresses)
         {
-            //var balance = await web3.Eth.GetBalance.SendRequestAsync(address);
-            var balance = await contract.GetFunction("balanceOf").CallAsync<BigInteger>(address);
-            nonCirculatingTokens += balance;
+            var balance = await _web3RPCAdapter.GetBalanceOfAddress(address, _settings.BLPContractABI, _settings.BLPAddress);
+            listOfNonCirculatingTokenAmounts.Add(balance);
         }
-
-        var circulatingSupply = totalSupply - nonCirculatingTokens;
-
-        var token = new Token
-        {
-            Name = "BLP",
-            CirculatingSupply = circulatingSupply.ToString(),
-            TotalSupply = totalSupply.ToString(),
-            DataFetchedAt = DateTime.UtcNow,
-        };
-
+       
+        var token = _getTokenEntityDomainService.Execute("BLP", totalSupply, listOfNonCirculatingTokenAmounts, DateTimeOffset.Now);
 
         await _tokenRepository.AddNewTokenInfo(token);
     }

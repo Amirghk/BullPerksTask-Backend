@@ -1,6 +1,6 @@
 ﻿using BullPerksTask.Application.Interfaces.Persistance;
+using BullPerksTask.Application.Models;
 using BullPerksTask.Domain.Entities;
-using BullPerksTask.Infrastructure.Persistence;
 
 namespace BullPerksTask.Application.Queries;
 
@@ -13,8 +13,29 @@ public class GetTokenInfoAppService
         _tokenRepository = tokenRepository;
     }
 
-    public async Task<Token> Execute(CancellationToken cancellationToken)
+    public async Task<TokenDataOutputModel?> Execute(CancellationToken cancellationToken)
     {
-        return await _tokenRepository.GetLastTokenInfo(cancellationToken);
+        var dbResult = await _tokenRepository.GetLastTokenInfo(cancellationToken);
+
+        return MapToOutputDto(dbResult);
+    }
+
+    private static TokenDataOutputModel? MapToOutputDto(Token? dbResult)
+    {
+
+        if (dbResult is null)
+        {
+            return null;
+        }
+
+        var result = new TokenDataOutputModel
+        {
+            Name = dbResult.Name,
+            TotalSupply = dbResult.TotalSupply,
+            CirculatingSupply = dbResult.CirculatingSupply,
+            UpdatedAt = dbResult.DataFetchedAt
+        };
+
+        return result;
     }
 }

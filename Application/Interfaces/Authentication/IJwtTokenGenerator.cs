@@ -1,8 +1,8 @@
-﻿using BullPerksTask.Domain;
+﻿using BullPerksTask.Application.Models;
 
 namespace BullPerksTask.Application.Interfaces.Authentication;
 
 public interface IJwtTokenGenerator
 {
-    string GenerateToken(UserModel model);
+    string GenerateToken(LoginModel model);
 }

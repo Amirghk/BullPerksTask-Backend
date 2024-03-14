@@ -1,10 +1,11 @@
 ﻿using BullPerksTask.Application.Commands;
 using BullPerksTask.Application.Queries;
 using BullPerksTask.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BullPerksTask.Presentation.Controllers;
-[Route("api/[controller]")]
+[Route(EndpointRoutes.TokenController)]
 [ApiController]
 public class TokenController : ControllerBase
 {
@@ -17,16 +18,16 @@ public class TokenController : ControllerBase
         _getTokenInfoAppService = getTokenInfoAppService;
     }
 
-    [HttpPost]
-    //[Authorize]
-    public async Task<IActionResult> Post(UserModel model)
+    [HttpPost(EndpointRoutes.Update)]
+    [Authorize]
+    public async Task<IActionResult> Update()
     {
         await _calculateTokenSupplyAndPersistToDatabaseAppService.Execute();
         return Ok();
     }
 
 
-    [HttpGet]
+    [HttpGet(EndpointRoutes.GetData)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         var token = await _getTokenInfoAppService.Execute(cancellationToken);

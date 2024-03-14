@@ -5,5 +5,5 @@ namespace BullPerksTask.Application.Interfaces.Persistance;
 public interface ITokenRepository
 {
     Task AddNewTokenInfo(Token token);
-    Task<Token> GetLastTokenInfo(CancellationToken cancellationToken);
+    Task<Token?> GetLastTokenInfo(CancellationToken cancellationToken);
 }

@@ -1,5 +1,5 @@
 ﻿using BullPerksTask.Application.Interfaces.Authentication;
-using BullPerksTask.Domain;
+using BullPerksTask.Application.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,7 +18,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     }
 
 
-    public string GenerateToken(UserModel model)
+    public string GenerateToken(LoginModel model)
     {
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(
