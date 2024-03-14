@@ -1,0 +1,1 @@
+To change the database from InMemory (which works out of the box) to SQLServer, Uncomment line 29 and comment line 28 in [here](Infrastructure/DependencyInjection.cs) and then run update database command.
